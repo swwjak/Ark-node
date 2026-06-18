@@ -3,15 +3,15 @@
 ## Current State (Pre-Netgear)
 
 ```
-Phone (10.98.79.83) ←→ Adam (10.98.79.63)     [WiFi Direct / ScottNet AP]
-                           ↕
-                    Ethernet Hub (unmanaged)
-                           ↕
-                    Eve (10.42.0.152)          [DHCP from Adam, SSH blocked]
+Phone ←→ Adam     [WiFi Direct / ScottNet AP]
+            ↕
+     Ethernet Hub (unmanaged)
+            ↕
+     Eve          [DHCP from Adam, SSH blocked]
 ```
 
 Problems:
-- Adam and Eve on different subnets (10.98.79.x vs 10.42.0.x)
+- Adam and Eve on different subnets
 - SSH between them fails (password mismatch, no key exchange)
 - No common DHCP server
 - Phone is the only bridge
@@ -63,22 +63,22 @@ The Netgear router provides:
 
 ### Phase 1: Router Discovery
 - [ ] Identify Netgear model
-- [ ] Record LAN subnet (likely 192.168.1.0/24 or 10.0.0.0/24)
-- [ ] Record gateway IP
-- [ ] Record DHCP range
-- [ ] Record admin credentials
+- [ ] Record LAN subnet, gateway, DHCP range
+- [ ] Discover all connected devices
+- [ ] Build topology map
+- [ ] Record MAC addresses for critical nodes
+- [ ] Determine static/reserved addresses
 
 ### Phase 2: Device Discovery
 - [ ] Scan all connected devices
 - [ ] Record MAC addresses
 - [ ] Identify each device by MAC + hostname
-- [ ] Map physical connections (Ethernet ports)
+- [ ] Map physical connections
 
 ### Phase 3: Static Leases
 - [ ] Reserve IP for Adam (by MAC)
 - [ ] Reserve IP for Eve (by MAC)
 - [ ] Reserve IP for Aqua X570 (by MAC)
-- [ ] Reserve IP for Rampage IV Gene (by MAC)
 - [ ] Reserve IPs for printers (by MAC)
 
 ### Phase 4: Node Configuration
@@ -93,13 +93,6 @@ The Netgear router provides:
 - [ ] Update TOPOLOGY.md
 - [ ] Update NODES.md
 - [ ] Update CONTINUITY-REPORT.md
-
-## MAC Addresses to Record
-- Adam: (on Adam) `ip link show eth0 | grep ether`
-- Eve: (on Eve) `ip link show eth0 | grep ether`
-- Aqua: (check BIOS or Windows)
-- Rampage: (check BIOS or Windows)
-- Printers: (check label or web interface)
 
 ## Questions to Answer
 1. What is the Netgear's default LAN IP?
