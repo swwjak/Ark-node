@@ -10,7 +10,6 @@ import json
 import subprocess
 import time
 import threading
-import socket
 from datetime import datetime
 
 NODE = os.environ.get("NODE_NAME", "node")
@@ -18,10 +17,8 @@ STATE_FILE = f"/home/pi/state/{NODE}.json"
 LOG_FILE = f"/home/pi/state/{NODE}.log"
 INVENTORY_FILE = "/home/pi/state/inventory.jsonl"
 
-# Ensure directories exist
 os.makedirs("/home/pi/state", exist_ok=True)
 
-# ─── State ───────────────────────────────────────────────
 state = {
     "node": NODE,
     "status": "READY",
@@ -55,7 +52,6 @@ def load_state():
     except:
         pass
 
-# ─── System Info ─────────────────────────────────────────
 def get_uptime():
     try:
         return subprocess.getoutput("uptime -p").replace("up ", "")
@@ -82,9 +78,8 @@ def get_memory():
     except:
         return "?"
 
-# ─── Inference ───────────────────────────────────────────
 def think(prompt):
-    """Run Ollama inference and return text response."""
+    """Run Ollama inference via subprocess. Returns text response."""
     state["mode"] = "THINKING"
     state["thought"] = prompt
     save_state()
@@ -101,13 +96,19 @@ def think(prompt):
         response = result.stdout.strip()
         if not response:
             response = "No response"
-            
+        
         state["mode"] = "IDLE"
         state["last_action"] = f"Thought about: {prompt[:50]}"
         save_state()
         log(f"THINK DONE: {response[:80]}")
         return response
         
+    except subprocess.TimeoutExpired:
+        state["mode"] = "IDLE"
+        state["errors"].append("Think timeout")
+        save_state()
+        log(f"THINK TIMEOUT: {prompt[:50]}")
+        return "Error: Inference timed out (300s). The model may be loading."
     except Exception as e:
         state["mode"] = "IDLE"
         state["errors"].append(str(e))
@@ -115,7 +116,6 @@ def think(prompt):
         log(f"THINK ERROR: {e}")
         return f"Error: {e}"
 
-# ─── Speech ──────────────────────────────────────────────
 def speak(text):
     """Speak text aloud via espeak-ng."""
     state["mode"] = "SPEAKING"
@@ -133,9 +133,7 @@ def speak(text):
         save_state()
         return f"Speech error: {e}"
 
-# ─── Inventory ───────────────────────────────────────────
 def inventory_list():
-    """Return all inventory items as text."""
     items = []
     try:
         with open(INVENTORY_FILE, 'r') as f:
@@ -145,37 +143,29 @@ def inventory_list():
                     items.append(json.loads(line))
     except:
         pass
-    
     if not items:
         return "Inventory is empty."
-    
     lines = [f"Inventory ({len(items)} items):"]
-    for item in items[-20]:  # Last 20
+    for item in items[-20:]:
         name = item.get("name", "?")
         loc = item.get("location", "?")
         ts = item.get("added", "?")[:16]
         lines.append(f"  {name} | {loc} | {ts}")
-    
     return "\n".join(lines)
 
 def inventory_add(name, location="", notes=""):
-    """Add item to inventory."""
     item = {
         "name": name,
         "location": location,
         "notes": notes,
         "added": datetime.now().isoformat()
     }
-    
     with open(INVENTORY_FILE, 'a') as f:
         f.write(json.dumps(item) + "\n")
-    
     log(f"INVENTORY ADD: {name}")
     return f"Added: {name} @ {location}"
 
-# ─── Status ──────────────────────────────────────────────
 def status():
-    """Return current status as text."""
     load_state()
     return f"""STATUS: {state['status']}
 MODE: {state['mode']}
@@ -188,34 +178,27 @@ LAST_ACTION: {state['last_action']}
 ERRORS: {len(state['errors'])}
 THOUGHT: {state.get('thought', 'None')}"""
 
-# ─── Command Processor ──────────────────────────────────
 def process_command(cmd_text):
-    """Process a text command and return text response."""
     cmd_text = cmd_text.strip()
     if not cmd_text:
         return "No command given. Try: STATUS, THINK, SPEAK, INVENTORY"
-    
     parts = cmd_text.split(None, 1)
     cmd = parts[0].upper()
     args = parts[1] if len(parts) > 1 else ""
     
     if cmd == "STATUS":
         return status()
-    
     elif cmd == "THINK":
         if not args:
             return "Usage: THINK <prompt>"
         return think(args)
-    
     elif cmd == "SPEAK":
         if not args:
             return "Usage: SPEAK <text>"
         return speak(args)
-    
     elif cmd == "INVENTORY":
         if args.upper().startswith("ADD "):
             item_text = args[4:]
-            # Parse: name | location | notes
             parts = [p.strip() for p in item_text.split("|")]
             name = parts[0] if parts else "unknown"
             loc = parts[1] if len(parts) > 1 else ""
@@ -223,40 +206,33 @@ def process_command(cmd_text):
             return inventory_add(name, loc, notes)
         else:
             return inventory_list()
-    
     elif cmd == "LOG":
         try:
             lines = subprocess.getoutput(f"tail -20 {LOG_FILE}")
             return f"Recent log:\n{lines}"
         except:
             return "No log available."
-    
     elif cmd == "PING":
         return f"PONG from {NODE}"
-    
     elif cmd == "HELP":
         return """Commands:
   STATUS — current state
-  THINK <prompt> — run inference
+  THINK <prompt> — run inference (~30s on Pi 4)
   SPEAK <text> — speak aloud
   INVENTORY — list items
   INVENTORY ADD name | location | notes — add item
   LOG — recent log entries
   PING — test connection
   HELP — this list"""
-    
     else:
         return f"Unknown command: {cmd}. Try HELP."
 
-# ─── Main Loop (interactive) ─────────────────────────────
 def interactive():
-    """Run interactive command loop."""
     print(f"╔══════════════════════════════════╗")
     print(f"║  {NODE:^32s}  ║")
     print(f"║  Text Core v1.0                  ║")
     print(f"╚══════════════════════════════════╝")
     print(f"Type HELP for commands. Ctrl+C to exit.\n")
-    
     while True:
         try:
             cmd = input(f"{NODE}> ")
@@ -269,12 +245,9 @@ def interactive():
         except EOFError:
             break
 
-# ─── Main ────────────────────────────────────────────────
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        # Single command mode: python3 core.py "STATUS"
         cmd = " ".join(sys.argv[1:])
         print(process_command(cmd))
     else:
-        # Interactive mode
         interactive()
