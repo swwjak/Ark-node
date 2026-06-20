@@ -1,0 +1,79 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-19T17:00:00-08:00",
+  "devices": [
+    {
+      "hostname": "adam",
+      "role": "inhabitant",
+      "type": "pi4",
+      "ip": "10.98.79.10",
+      "status": "active",
+      "capabilities": ["ollama", "espeak-ng", "cups", "ssh", "camera"],
+      "storage": "465GB SSD",
+      "services": ["ollama", "cups", "ssh", "avahi-daemon"],
+      "notes": "Explorer/Builder. Boots from SSD. Needs migration to USB."
+    },
+    {
+      "hostname": "eve",
+      "role": "inhabitant",
+      "type": "pi4",
+      "ip": "10.98.79.228",
+      "status": "active",
+      "capabilities": ["ollama", "espeak-ng", "ssh", "cups"],
+      "storage": "59GB SD",
+      "services": ["ollama", "ssh", "avahi-daemon"],
+      "notes": "Archivist/Librarian. Has 3x USB thumb drives."
+    },
+    {
+      "hostname": "phone",
+      "role": "courier",
+      "type": "android",
+      "ip": "10.98.79.83",
+      "status": "active",
+      "capabilities": ["hotspot", "archive", "github", "hermes"],
+      "storage": "108GB",
+      "services": ["hotspot", "hermes-agent"],
+      "notes": "Gateway between worlds. Carries the Archive."
+    },
+    {
+      "hostname": "hp-m207",
+      "role": "scribe",
+      "type": "printer",
+      "bus": "usb",
+      "status": "active",
+      "capabilities": ["print"],
+      "scanner": "unsupported",
+      "notes": "HP LaserJet M207-M212. Connected to Adam. Scanner not supported by HPLIP 3.22.10."
+    }
+  ],
+  "planned": [
+    {
+      "hostname": "pi3-archive",
+      "role": "archive",
+      "type": "pi3",
+      "status": "planned",
+      "capabilities": ["sqlite3", "ripgrep", "rsync", "indexing"]
+    },
+    {
+      "hostname": "pi3-messenger",
+      "role": "messenger",
+      "type": "pi3",
+      "status": "planned",
+      "capabilities": ["mqtt", "state-relay", "logging"]
+    },
+    {
+      "hostname": "pi3-voice",
+      "role": "voice",
+      "type": "pi3",
+      "status": "planned",
+      "capabilities": ["espeak-ng", "piper", "audio-cache"]
+    },
+    {
+      "hostname": "pi3-watchtower",
+      "role": "watchtower",
+      "type": "pi3",
+      "status": "planned",
+      "capabilities": ["nmap", "monitoring", "sensors"]
+    }
+  ]
+}
