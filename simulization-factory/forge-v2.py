@@ -147,15 +147,58 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except:
                 pass
             
-            # Log and acknowledge (actual flash happens via separate confirmed process)
-            log_line = f"[{self._now()}] FLASH_REQUEST: {image_path} -> {target}\n"
+            # Log and execute
             os.makedirs("/home/pi/logs/forge", exist_ok=True)
-            with open("/home/pi/logs/forge/forge.log", "a") as f:
-                f.write(log_line)
+            log_f = open("/home/pi/logs/forge/forge.log", "a")
+            log_f.write(f"[{self._now()}] FLASH_START: {image_path} -> {target}\n")
+            log_f.flush()
+            
+            # Unmount target partitions
+            try:
+                lsblk_out = subprocess.run(
+                    ["lsblk", "-n", "-o", "MOUNTPOINT", target],
+                    capture_output=True, text=True
+                ).stdout.strip()
+                for mount in lsblk_out.split("\n"):
+                    if mount:
+                        subprocess.run(["sudo", "umount", mount], capture_output=True)
+                        log_f.write(f"[{self._now()}] Unmounted {mount}\n")
+                        log_f.flush()
+            except:
+                pass
+            
+            # Execute dd with progress
+            import threading
+            def do_flash():
+                try:
+                    cmd = f"sudo dd if={image_path} of={target} bs=4M status=progress conv=fsync"
+                    log_f.write(f"[{self._now()}] CMD: {cmd}\n")
+                    log_f.flush()
+                    proc = subprocess.Popen(
+                        cmd.split(),
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True
+                    )
+                    for line in proc.stdout:
+                        log_f.write(f"[{self._now()}] dd: {line.strip()}\n")
+                        log_f.flush()
+                    proc.wait()
+                    if proc.returncode == 0:
+                        log_f.write(f"[{self._now()}] FLASH_SUCCESS: {target}\n")
+                    else:
+                        log_f.write(f"[{self._now()}] FLASH_FAILED: exit {proc.returncode}\n")
+                except Exception as e:
+                    log_f.write(f"[{self._now()}] FLASH_ERROR: {e}\n")
+                finally:
+                    log_f.close()
+            
+            thread = threading.Thread(target=do_flash, daemon=True)
+            thread.start()
             
             self._send_json({
                 "success": True,
-                "message": f"Flash request logged for {target}. Use the web interface to execute."
+                "message": f"Flashing {os.path.basename(image_path)} to {target}. Check logs for progress."
             })
         
         else:
