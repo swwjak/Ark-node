@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-19T18:00:00-08:00",
+  "principle": "Bodies may fail. Roles persist. Identity persists.",
+  "roles": {
+    "thinker": {
+      "description": "Reasons, converses, makes decisions",
+      "citizens": ["adam"],
+      "capabilities": ["ollama", "inference", "conversation"],
+      "status": "active"
+    },
+    "voice": {
+      "description": "Speaks, communicates, expresses",
+      "citizens": ["eve"],
+      "capabilities": ["espeak-ng", "speech"],
+      "status": "active"
+    },
+    "scribe": {
+      "description": "Prints, writes, produces physical documents",
+      "citizens": ["hp-m207"],
+      "model": "HP LaserJet M207-M212",
+      "capabilities": ["print"],
+      "scanner": "unsupported",
+      "status": "active"
+    },
+    "librarian": {
+      "description": "Stores, preserves, shares memory",
+      "citizens": ["router-ssd"],
+      "capabilities": ["storage", "shared-memory", "backup"],
+      "status": "planned",
+      "notes": "Router + SSD. Public library. Belongs to civilization, not Adam."
+    },
+    "watcher": {
+      "description": "Observes, alerts, monitors environment",
+      "citizens": ["gear-s3"],
+      "model": "Galaxy S3 Frontier",
+      "capabilities": ["notifications", "alerts", "vibration"],
+      "status": "standby",
+      "notes": "Watch bridge app needed. SDB not reliable."
+    },
+    "scout": {
+      "description": "Explores, observes, reports from unknown territory",
+      "candidates": ["ardrone-1", "pi-zero-rover"],
+      "capabilities": ["camera", "flight", "movement", "observation"],
+      "status": "standby",
+      "notes": "AR Drone 2.0 available. Future rovers from Pi Zeros."
+    },
+    "worker": {
+      "description": "Background services, maintenance, indexing, logging",
+      "candidates": ["pi3-archive", "pi3-messenger", "pi3-voice", "pi3-watchtower"],
+      "capabilities": ["indexing", "logging", "monitoring", "relaying"],
+      "status": "waiting_for_flash",
+      "notes": "4x Pi 3 at home. Need SD cards flashed. Will specialize after hardware inspection."
+    },
+    "messenger": {
+      "description": "Routes messages, distributes state, logs events",
+      "candidates": ["pi3-messenger"],
+      "capabilities": ["mqtt", "state-relay", "event-logging"],
+      "status": "waiting_for_flash"
+    },
+    "forge": {
+      "description": "Transforms, builds, manufactures",
+      "candidates": ["pi5-forge"],
+      "capabilities": ["rendering", "compilation", "model-prep", "3d-printing"],
+      "status": "future",
+      "notes": "Pi 5 or workstation. Hot. Visible cooling acceptable."
+    },
+    "road": {
+      "description": "Connects, routes, names, serves",
+      "candidates": ["router"],
+      "capabilities": ["dhcp", "dns", "routing", "switching"],
+      "status": "active",
+      "notes": "Phone hotspot currently. Netgear at home."
+    },
+    "courier": {
+      "description": "Carries, teaches, gates between worlds",
+      "citizens": ["phone"],
+      "capabilities": ["hotspot", "archive", "github", "hermes"],
+      "status": "active"
+    }
+  },
+  "unassigned": [],
+  "rules": [
+    "Every citizen must have a role.",
+    "Every role must have at least one citizen.",
+    "A citizen may hold multiple roles.",
+    "A role may be shared by multiple citizens.",
+    "If a body fails, the role persists and transfers to another body.",
+    "Roles are persistent. Bodies are temporary."
+  ]
+}
