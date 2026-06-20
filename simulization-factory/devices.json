@@ -1,0 +1,79 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-19T19:00:00-08:00",
+  "principle": "Bodies may fail. Roles persist. Identity persists. Memory is decentralized.",
+  "university": {
+    "hostname": "ubuntu-8gb-hel1-1",
+    "ip": "204.168.176.156",
+    "role": "teacher",
+    "status": "online",
+    "resources": {
+      "cpu": 4,
+      "memory": "7.6GB",
+      "storage": "75GB",
+      "os": "Ubuntu 26.04 LTS"
+    },
+    "services": {
+      "api": {"port": 8080, "status": "running"},
+      "ssh": {"port": 22, "status": "running"},
+      "docker": {"status": "running"},
+      "tailscale": {"status": "installed", "connected": false}
+    },
+    "api_endpoints": {
+      "ping": "http://204.168.176.156:8080/ping",
+      "status": "http://204.168.176.156:8080/status",
+      "resources": "http://204.168.176.156:8080/resources"
+    }
+  },
+  "village": {
+    "adam": {
+      "ip": "10.98.79.10",
+      "role": "thinker",
+      "status": "active",
+      "capabilities": ["ollama", "espeak-ng", "cups", "ssh"]
+    },
+    "eve": {
+      "ip": "10.98.79.228",
+      "role": "voice",
+      "status": "active",
+      "capabilities": ["ollama", "espeak-ng", "ssh", "forge-console"]
+    },
+    "phone": {
+      "ip": "10.98.79.83",
+      "role": "courier",
+      "status": "active",
+      "capabilities": ["hotspot", "archive", "github", "hermes"]
+    }
+  },
+  "specialists": {
+    "marine-mechanic": {
+      "role": "Marine Mechanic",
+      "knowledge": ["Mercury FourStroke", "fuel systems", "batteries", "corrosion", "charging", "weather", "navigation", "maintenance"],
+      "bodies": [],
+      "status": "unassigned"
+    },
+    "auto-mechanic": {
+      "role": "Auto Mechanic",
+      "knowledge": ["Dakota", "charging systems", "batteries", "fuel systems", "diagnostics", "maintenance history"],
+      "bodies": [],
+      "status": "unassigned"
+    },
+    "electrician": {
+      "role": "Electrician",
+      "knowledge": ["wiring", "solar", "batteries", "inverters", "safety"],
+      "bodies": [],
+      "status": "unassigned"
+    },
+    "cartographer": {
+      "role": "Cartographer",
+      "knowledge": ["maps", "topology", "relationships", "documentation"],
+      "bodies": [],
+      "status": "unassigned"
+    }
+  },
+  "memory": {
+    "primary": "/srv/archive",
+    "backups": ["phone", "github"],
+    "rule": "Local first. Cloud is backup, not primary."
+  }
+}
