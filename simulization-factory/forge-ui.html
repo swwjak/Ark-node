@@ -82,8 +82,9 @@
                 if (!data.length) h = '<p>No images in /tmp</p>';
                 data.forEach(img => {
                     const sel = selImg === img.path ? 'selected' : '';
-                    h += `<div class="item image-item ${sel}" onclick="selImage('${img.path}','${img.name}','${img.size_human}')">
-                        <b>${img.name}</b> <span style="color:#666">(${img.size_human})</span>
+                    const raw_label = img.raw ? '<span class="ok">[RAW]</span>' : '<span class="warning">[COMPRESSED - will not boot]</span>';
+                    h += `<div class="item image-item ${sel}" onclick="selImage('${img.path}','${img.name}','${img.size_human}',${img.raw})">
+                        <b>${img.name}</b> <span style="color:#666">(${img.size_human})</span> ${raw_label}
                     </div>`;
                 });
                 document.getElementById('images').innerHTML = h;
@@ -112,9 +113,14 @@
             }).catch(() => {});
         }
         
-        function selImage(path, name, size) {
+        function selImage(path, name, size, raw) {
             selImg = path;
             document.getElementById('sel-image').textContent = name + ' (' + size + ')';
+            if (!raw) {
+                document.getElementById('danger-msg').textContent = '⚠ COMPRESSED IMAGE - will not boot! Use .img file.';
+            } else {
+                document.getElementById('danger-msg').textContent = '';
+            }
             checkReady();
         }
         
@@ -143,6 +149,11 @@
         });
         
         document.getElementById('flash-btn').addEventListener('click', function() {
+            // Check if image is raw
+            if (selImg && !selImg.endsWith('.img')) {
+                alert('Cannot flash compressed image! Select the .img file.');
+                return;
+            }
             if (!confirm('Destroy all data on ' + selDrv + '?')) return;
             fetch('/api/flash', {
                 method: 'POST',

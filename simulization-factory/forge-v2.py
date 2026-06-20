@@ -25,9 +25,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
                         "name": f.name,
                         "path": str(f),
                         "size": size,
-                        "size_human": self._format_size(size)
+                        "size_human": self._format_size(size),
+                        "raw": f.suffix == ".img"
                     })
-            images.sort(key=lambda x: x["name"])
+            images.sort(key=lambda x: (not x.get("raw", False), x["name"]))
             self._send_json(images)
         
         elif self.path == '/api/drives':
