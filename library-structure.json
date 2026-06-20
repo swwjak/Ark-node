@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "created": "2026-06-19T16:46:00-08:00",
+  "updated": "2026-06-19T16:46:00-08:00",
+  "description": "The public memory of the civilization. Belongs to everyone. Survives hardware.",
+  "paths": {
+    "root": "/library",
+    "documents": "/library/documents",
+    "photos": "/library/photos",
+    "inventory": "/library/inventory",
+    "devices": "/library/devices",
+    "models": "/library/models",
+    "archives": "/library/archives",
+    "society": "/library/society",
+    "logs": "/library/logs",
+    "scans": "/library/documents/scans"
+  },
+  "files": {
+    "devices": "/library/society/devices.json",
+    "inventory": "/library/inventory/items.jsonl",
+    "log": "/library/logs/civilization.log"
+  },
+  "backups": {
+    "enabled": true,
+    "targets": ["github", "eve"],
+    "frequency": "on_change"
+  }
+}
